@@ -8,7 +8,7 @@ int main() {
     string u1, u2, uname;
 
     while (true) {
-        cout << "\n===== Social Graph Test Menu =====\n";
+        cout << "\n===== 🌐 Social Graph Menu =====\n";
         cout << "1. Add User\n";
         cout << "2. Remove User\n";
         cout << "3. Add Friendship\n";
@@ -17,7 +17,9 @@ int main() {
         cout << "6. Get Friends of a User\n";
         cout << "7. Get Mutual Friends\n";
         cout << "8. Check Connection (via BFS)\n";
-        cout << "9. Clear Graph\n";
+        cout << "9. Compute PageRank\n";
+        cout << "10. Recommend Friends\n";
+        cout << "11. Clear Graph\n";
         cout << "0. Exit\n";
         cout << "Enter choice: ";
         cin >> choice;
@@ -54,12 +56,11 @@ int main() {
             case 6: {
                 cout << "Enter username: ";
                 cin >> uname;
-                vector<string> friendList = g.getFriends(uname);
-                if (friendList.empty())
-                    cout << "⚠️  No friends found or user not found.\n";
+                auto friends = g.getFriends(uname);
+                if (friends.empty()) cout << "⚠️  No friends or user not found.\n";
                 else {
                     cout << "👥 Friends of " << uname << ": ";
-                    for (auto& f : friendList) cout << f << " ";
+                    for (auto &f : friends) cout << f << " ";
                     cout << "\n";
                 }
                 break;
@@ -68,12 +69,11 @@ int main() {
             case 7: {
                 cout << "Enter two usernames: ";
                 cin >> u1 >> u2;
-                vector<string> mutualList = g.getMutualFriends(u1, u2);
-                if (mutualList.empty())
-                    cout << "⚠️  No mutual friends.\n";
+                auto mutual = g.getMutualFriends(u1, u2);
+                if (mutual.empty()) cout << "⚠️  No mutual friends.\n";
                 else {
                     cout << "🤝 Mutual friends: ";
-                    for (auto& f : mutualList) cout << f << " ";
+                    for (auto &f : mutual) cout << f << " ";
                     cout << "\n";
                 }
                 break;
@@ -88,6 +88,17 @@ int main() {
                 break;
 
             case 9:
+                g.computePageRank();
+                g.displayPageRank();
+                break;
+
+            case 10:
+                cout << "Enter username for recommendation: ";
+                cin >> uname;
+                g.recommendFriends(uname, 3);
+                break;
+
+            case 11:
                 g.clear();
                 cout << "🧹 Graph cleared.\n";
                 break;
