@@ -5,25 +5,33 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+using namespace std;
 
 class FileManager {
 private:
-    std::string filePath;
+    string filePath;
 
 public:
-    // Use dataset/users.csv as default
-    FileManager(const std::string& path = "dataset/users.csv");
+    FileManager(const string& path = "dataset/users.csv");
 
-    void load(std::unordered_map<std::string, std::unordered_set<std::string>>& adjList);
-    void save(const std::unordered_map<std::string, std::unordered_set<std::string>>& adjList);
+    // Load and save using hashed IDs
+    void loadWithHashes(unordered_map<string, unordered_set<string>>& adjList,
+                        unordered_map<string, string>& idToUser,
+                        unordered_map<string, string>& userToId);
 
-    void addUser(const std::string& username);
-    void removeUser(const std::string& username);
-    void updateFriendships(const std::unordered_map<std::string, std::unordered_set<std::string>>& adjList);
+    void saveWithHashes(const unordered_map<string, unordered_set<string>>& adjList,
+                        const unordered_map<string, string>& idToUser,
+                        const unordered_map<string, string>& userToId);
+
+    // Incremental updates
+    void addUser(const string& id, const string& username);
+    void removeUser(const string& id);
+    void updateFriendships(const unordered_map<string, unordered_set<string>>& adjList,
+                           const unordered_map<string, string>& userToId);
 
 private:
-    std::vector<std::string> split(const std::string& s, char delimiter);
-    std::string join(const std::unordered_set<std::string>& items, char delimiter);
+    vector<string> split(const string& s, char delimiter);
+    string join(const vector<string>& items, char delimiter);
 };
 
 #endif

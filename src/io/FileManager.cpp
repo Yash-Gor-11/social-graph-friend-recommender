@@ -5,143 +5,133 @@
 #include <filesystem>
 #include <algorithm>
 
-FileManager::FileManager(const std::string& path) {
-    // Determine a sensible base (project root). If running from build/, go one level up.
-    std::filesystem::path base = std::filesystem::current_path();
+using namespace std;
+
+FileManager::FileManager(const string& path) {
+    filesystem::path base = filesystem::current_path();
     if (base.filename() == "build" || base.filename() == "Build")
         base = base.parent_path();
 
-    // If a relative path was provided, make it relative to base. Otherwise use the absolute path.
-    std::filesystem::path p(path);
-    if (p.is_relative())
-        filePath = (base / p).lexically_normal().string();
-    else
-        filePath = p.lexically_normal().string();
-
-    std::filesystem::create_directories(std::filesystem::path(filePath).parent_path());
+    filesystem::path p(path);
+    filePath = p.is_relative() ? (base / p).lexically_normal().string() : p.lexically_normal().string();
+    filesystem::create_directories(filesystem::path(filePath).parent_path());
 }
 
-std::vector<std::string> FileManager::split(const std::string& s, char delimiter) {
-    std::vector<std::string> tokens;
-    std::stringstream ss(s);
-    std::string item;
-    while (std::getline(ss, item, delimiter)) {
+vector<string> FileManager::split(const string& s, char delimiter) {
+    vector<string> tokens;
+    stringstream ss(s);
+    string item;
+    while (getline(ss, item, delimiter)) {
         if (!item.empty()) tokens.push_back(item);
     }
     return tokens;
 }
 
-std::string FileManager::join(const std::unordered_set<std::string>& items, char delimiter) {
-    // Produce deterministic order: copy to vector and sort.
-    std::vector<std::string> vec(items.begin(), items.end());
-    std::sort(vec.begin(), vec.end());
-    std::string result;
-    bool first = true;
-    for (const auto &item : vec) {
-        if (!first) result.push_back(delimiter);
-        result += item;
-        first = false;
+string FileManager::join(const vector<string>& items, char delimiter) {
+    string result;
+    for (size_t i = 0; i < items.size(); ++i) {
+        result += items[i];
+        if (i + 1 < items.size()) result.push_back(delimiter);
     }
     return result;
 }
 
-void FileManager::load(std::unordered_map<std::string, std::unordered_set<std::string>>& adjList) {
-    std::ifstream file(filePath);
+// ============ LOAD ============
+
+void FileManager::loadWithHashes(unordered_map<string, unordered_set<string>>& adjList,
+                                 unordered_map<string, string>& idToUser,
+                                 unordered_map<string, string>& userToId) {
+    ifstream file(filePath);
     if (!file.is_open()) {
-        std::cerr << "users.csv not found at " << filePath << ", starting fresh.\n";
+        cerr << "users.csv not found at " << filePath << ", starting fresh.\n";
         return;
     }
 
-    std::string line;
-    while (std::getline(file, line)) {
+    string line;
+    while (getline(file, line)) {
         if (line.empty()) continue;
-        std::stringstream ss(line);
-        std::string username, friendsField;
-        std::getline(ss, username, ',');
-        std::getline(ss, friendsField, ',');
+        stringstream ss(line);
+        string id, username, friendsField;
+        getline(ss, id, ',');
+        getline(ss, username, ',');
+        getline(ss, friendsField, ',');
 
-        // Trim possible Windows CR at end of fields
-        if (!friendsField.empty() && friendsField.back() == '\r') friendsField.pop_back();
-        if (!username.empty() && username.back() == '\r') username.pop_back();
+        idToUser[id] = username;
+        userToId[username] = id;
 
-        std::unordered_set<std::string> friends;
-        for (auto& f : split(friendsField, '|')) {
-            if (!f.empty()) friends.insert(f);
+        unordered_set<string> friendNames;
+        for (auto& fid : split(friendsField, '|')) {
+            if (idToUser.count(fid))
+                friendNames.insert(idToUser[fid]);
         }
-        if (!username.empty())
-            adjList[username] = friends;
+        adjList[username] = friendNames;
     }
 
     file.close();
-    std::cout << "Loaded users from " << filePath << "\n";
+    cout << "Loaded users (with hash IDs) from " << filePath << "\n";
 }
 
-void FileManager::save(const std::unordered_map<std::string, std::unordered_set<std::string>>& adjList) {
-    // Write deterministic rows: sort user keys first
-    std::vector<std::string> users;
-    users.reserve(adjList.size());
-    for (const auto &p : adjList) users.push_back(p.first);
-    std::sort(users.begin(), users.end());
+// ============ SAVE ============
 
-    std::ofstream file(filePath, std::ios::trunc);
+void FileManager::saveWithHashes(const unordered_map<string, unordered_set<string>>& adjList,
+                                 const unordered_map<string, string>& idToUser,
+                                 const unordered_map<string, string>& userToId) {
+    ofstream file(filePath, ios::trunc);
     if (!file.is_open()) {
-        std::cerr << "Error opening " << filePath << " for writing.\n";
+        cerr << "Error opening " << filePath << " for writing.\n";
         return;
     }
 
-    for (const auto &user : users) {
-        const auto &friends = adjList.at(user);
-        file << user << ",";
-        file << join(friends, '|') << "\n";
+    for (auto& [id, username] : idToUser) {
+        const auto& friends = adjList.at(username);
+        vector<string> friendIds;
+        for (auto& f : friends)
+            if (userToId.count(f)) friendIds.push_back(userToId.at(f));
+
+        file << id << "," << username << "," << join(friendIds, '|') << "\n";
     }
 
     file.close();
-    std::cout << "Data saved to " << filePath << "\n";
+    cout << "Saved users with hash IDs to " << filePath << "\n";
 }
 
-void FileManager::addUser(const std::string& username) {
-    std::ofstream file(filePath, std::ios::app);
+// ============ ADD/REMOVE USERS ============
+
+void FileManager::addUser(const string& id, const string& username) {
+    ofstream file(filePath, ios::app);
     if (!file.is_open()) return;
-    file << username << ",\n";
+    file << id << "," << username << ",\n";
     file.close();
 }
 
-void FileManager::removeUser(const std::string& username) {
-    std::ifstream in(filePath);
+void FileManager::removeUser(const string& id) {
+    ifstream in(filePath);
     if (!in.is_open()) return;
 
-    std::stringstream buffer;
-    std::string line;
-
-    while (std::getline(in, line)) {
+    stringstream buffer;
+    string line;
+    while (getline(in, line)) {
         if (line.empty()) continue;
-        std::stringstream ss(line);
-        std::string user, friendsField;
-        std::getline(ss, user, ',');
-        std::getline(ss, friendsField, ',');
-
-        // Trim CR
-        if (!friendsField.empty() && friendsField.back() == '\r') friendsField.pop_back();
-        if (!user.empty() && user.back() == '\r') user.pop_back();
-
-        if (user == username) continue;
-
-        auto friends = split(friendsField, '|');
-        std::string newFriends;
-        for (auto& f : friends)
-            if (f != username) newFriends += f + "|";
-        if (!newFriends.empty()) newFriends.pop_back();
-
-        buffer << user << "," << newFriends << "\n";
+        stringstream ss(line);
+        string currentId;
+        getline(ss, currentId, ',');
+        if (currentId == id) continue;
+        buffer << line << "\n";
     }
 
     in.close();
-
-    std::ofstream out(filePath, std::ios::trunc);
+    ofstream out(filePath, ios::trunc);
     out << buffer.str();
     out.close();
 }
 
-void FileManager::updateFriendships(const std::unordered_map<std::string, std::unordered_set<std::string>>& adjList) {
-    save(adjList);
+// ============ UPDATE FRIENDSHIPS ============
+
+void FileManager::updateFriendships(const unordered_map<string, unordered_set<string>>& adjList,
+                                    const unordered_map<string, string>& userToId) {
+    unordered_map<string, string> idToUser;
+    for (auto& [u, id] : userToId)
+        idToUser[id] = u;
+
+    saveWithHashes(adjList, idToUser, userToId);
 }

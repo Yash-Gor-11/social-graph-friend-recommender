@@ -5,47 +5,44 @@
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
-#include "../io/FileManager.hpp"  
+#include "../io/FileManager.hpp"
+#include "../utils/utils.hpp"
+
+using namespace std;
 
 class Graph {
 private:
-    std::unordered_map<std::string, std::unordered_set<std::string>> adjList;
-    std::unordered_map<std::string, double> pageRank;
+    unordered_map<string, unordered_set<string>> adjList;
+    unordered_map<string, double> pageRank;
+    unordered_map<string, string> userToId;  // username -> id
+    unordered_map<string, string> idToUser;  // id -> username
+
     double damping = 0.85;
     int iterations = 20;
-    
+
     FileManager fileManager;
 
 public:
     Graph();
-    // ===== User Management =====
-    bool addUser(const std::string& username);
-    bool removeUser(const std::string& username);
 
-    // ===== Friendship Management =====
-    bool addFriendship(const std::string& u1, const std::string& u2);
-    bool removeFriendship(const std::string& u1, const std::string& u2);
+    bool addUser(const string& username);
+    bool removeUser(const string& username);
 
-    // ===== Queries =====
-    std::vector<std::string> getFriends(const std::string& username) const;
-    std::vector<std::string> getMutualFriends(const std::string& u1, const std::string& u2) const;
-    bool areConnected(const std::string& u1, const std::string& u2) const;
+    bool addFriendship(const string& u1, const string& u2);
+    bool removeFriendship(const string& u1, const string& u2);
 
-    // ===== PageRank =====
+    vector<string> getFriends(const string& username) const;
+    vector<string> getMutualFriends(const string& u1, const string& u2) const;
+    bool areConnected(const string& u1, const string& u2) const;
+
     void computePageRank();
     void displayPageRank() const;
 
-    // ===== Friend Recommendation =====
-    std::vector<std::pair<std::string, double>> recommendFriends(const std::string& user, int topK = 3) const;
+    vector<pair<string, double>> recommendFriends(const string& user, int topK = 3) const;
 
-    // ===== Display =====
     void displayAllUsers() const;
-
-    // ===== Utility =====
     void clear();
-
-    // Persist current in-memory graph to CSV without clearing
     void save();
 };
 
-#endif // GRAPH_HPP
+#endif
