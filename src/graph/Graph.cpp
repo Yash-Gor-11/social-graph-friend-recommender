@@ -3,12 +3,19 @@
 #include <queue>
 #include <algorithm>
 #include <iomanip>
+#include "../io/FileManager.hpp"
+
+// Constructor: load CSV data at start
+Graph::Graph() : fileManager("dataset/users.csv") {
+    fileManager.load(adjList);
+}
 
 // =================== BASIC USER MANAGEMENT ===================
 
 bool Graph::addUser(const std::string& username) {
     if (adjList.count(username)) return false;
     adjList[username]; // create empty friend list
+    fileManager.addUser(username);   // 🔹 save to CSV (append)
     return true;
 }
 
@@ -16,6 +23,7 @@ bool Graph::removeUser(const std::string& username) {
     if (!adjList.count(username)) return false;
     for (auto &entry : adjList) entry.second.erase(username);
     adjList.erase(username);
+    fileManager.removeUser(username);  // 🔹 remove from CSV
     return true;
 }
 
@@ -26,6 +34,7 @@ bool Graph::addFriendship(const std::string& u1, const std::string& u2) {
     if (!adjList.count(u1) || !adjList.count(u2)) return false;
     adjList[u1].insert(u2);
     adjList[u2].insert(u1);
+    fileManager.updateFriendships(adjList);  // 🔹 sync CSV
     return true;
 }
 
@@ -33,6 +42,7 @@ bool Graph::removeFriendship(const std::string& u1, const std::string& u2) {
     if (!adjList.count(u1) || !adjList.count(u2)) return false;
     adjList[u1].erase(u2);
     adjList[u2].erase(u1);
+    fileManager.updateFriendships(adjList);  // 🔹 sync CSV
     return true;
 }
 
@@ -91,7 +101,7 @@ bool Graph::areConnected(const std::string& u1, const std::string& u2) const {
 void Graph::computePageRank() {
     int N = adjList.size();
     if (N == 0) {
-        std::cout << "⚠️  Graph is empty.\n";
+        std::cout << "Graph is empty.\n";
         return;
     }
 
@@ -116,15 +126,15 @@ void Graph::computePageRank() {
         pageRank = newRank;
     }
 
-    std::cout << "\n✅ PageRank computed successfully!\n";
+    std::cout << "\nPageRank computed successfully!\n";
 }
 
 void Graph::displayPageRank() const {
     if (pageRank.empty()) {
-        std::cout << "⚠️  PageRank not computed yet.\n";
+        std::cout << "PageRank not computed yet.\n";
         return;
     }
-    std::cout << "\n--- 📊 PageRank Scores ---\n";
+    std::cout << "\n--- PageRank Scores ---\n";
     for (auto &p : pageRank)
         std::cout << p.first << ": " << std::fixed << std::setprecision(4) << p.second << "\n";
 }
@@ -133,7 +143,7 @@ void Graph::displayPageRank() const {
 
 std::vector<std::pair<std::string, double>> Graph::recommendFriends(const std::string& user, int topK) const {
     if (!adjList.count(user)) {
-        std::cout << "⚠️  User not found.\n";
+        std::cout << "User not found.\n";
         return {};
     }
 
@@ -157,17 +167,17 @@ std::vector<std::pair<std::string, double>> Graph::recommendFriends(const std::s
     std::sort(sorted.begin(), sorted.end(),
               [](auto &a, auto &b) { return a.second > b.second; });
 
-    std::cout << "\n--- 🤖 Friend Recommendations for " << user << " ---\n";
+    std::cout << "\n--- Friend Recommendations for " << user << " ---\n";
     int count = 0;
     for (auto &p : sorted) {
         if (p.second <= 0) continue;
-        std::cout << "👉 " << p.first
+        std::cout <<  p.first
                   << " | Score: " << std::fixed << std::setprecision(4) << p.second << "\n";
         if (++count >= topK) break;
     }
 
     if (count == 0)
-        std::cout << "⚠️  No friend recommendations available.\n";
+        std::cout << "No friend recommendations available.\n";
 
     return sorted;
 }
@@ -175,7 +185,7 @@ std::vector<std::pair<std::string, double>> Graph::recommendFriends(const std::s
 // =================== DISPLAY AND UTILITY ===================
 
 void Graph::displayAllUsers() const {
-    std::cout << "\n--- 👥 Users and their Friends ---\n";
+    std::cout << "\n--- Users and their Friends ---\n";
     if (adjList.empty()) {
         std::cout << "(Graph is empty)\n";
         return;
@@ -191,5 +201,10 @@ void Graph::displayAllUsers() const {
 void Graph::clear() {
     adjList.clear();
     pageRank.clear();
-    std::cout << "🧹 Graph cleared.\n";
+    fileManager.save(adjList); // rewrite empty file on explicit clear
+    std::cout << "Graph cleared.\n";
+}
+
+void Graph::save() {
+    fileManager.save(adjList);
 }

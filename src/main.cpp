@@ -8,7 +8,7 @@ int main() {
     string u1, u2, uname;
 
     while (true) {
-        cout << "\n===== 🌐 Social Graph Menu =====\n";
+        cout << "\n===== Social Graph Menu =====\n";
         cout << "1. Add User\n";
         cout << "2. Remove User\n";
         cout << "3. Add Friendship\n";
@@ -28,25 +28,25 @@ int main() {
             case 1:
                 cout << "Enter username: ";
                 cin >> uname;
-                cout << (g.addUser(uname) ? "✅ User added!\n" : "⚠️  User already exists.\n");
+                cout << (g.addUser(uname) ? " User added!\n" : "  User already exists.\n");
                 break;
 
             case 2:
                 cout << "Enter username: ";
                 cin >> uname;
-                cout << (g.removeUser(uname) ? "✅ User removed.\n" : "⚠️  User not found.\n");
+                cout << (g.removeUser(uname) ? " User removed.\n" : "  User not found.\n");
                 break;
 
             case 3:
                 cout << "Enter two usernames: ";
                 cin >> u1 >> u2;
-                cout << (g.addFriendship(u1, u2) ? "✅ Friendship added!\n" : "⚠️  Error adding friendship.\n");
+                cout << (g.addFriendship(u1, u2) ? "Friendship added!\n" : "  Error adding friendship.\n");
                 break;
 
             case 4:
                 cout << "Enter two usernames: ";
                 cin >> u1 >> u2;
-                cout << (g.removeFriendship(u1, u2) ? "✅ Friendship removed.\n" : "⚠️  Error removing friendship.\n");
+                cout << (g.removeFriendship(u1, u2) ? "Friendship removed.\n" : "  Error removing friendship.\n");
                 break;
 
             case 5:
@@ -57,9 +57,9 @@ int main() {
                 cout << "Enter username: ";
                 cin >> uname;
                 auto friends = g.getFriends(uname);
-                if (friends.empty()) cout << "⚠️  No friends or user not found.\n";
+                if (friends.empty()) cout << "  No friends or user not found.\n";
                 else {
-                    cout << "👥 Friends of " << uname << ": ";
+                    cout << "Friends of " << uname << ": ";
                     for (auto &f : friends) cout << f << " ";
                     cout << "\n";
                 }
@@ -70,9 +70,9 @@ int main() {
                 cout << "Enter two usernames: ";
                 cin >> u1 >> u2;
                 auto mutual = g.getMutualFriends(u1, u2);
-                if (mutual.empty()) cout << "⚠️  No mutual friends.\n";
+                if (mutual.empty()) cout << "  No mutual friends.\n";
                 else {
-                    cout << "🤝 Mutual friends: ";
+                    cout << "Mutual friends: ";
                     for (auto &f : mutual) cout << f << " ";
                     cout << "\n";
                 }
@@ -83,8 +83,8 @@ int main() {
                 cout << "Enter two usernames: ";
                 cin >> u1 >> u2;
                 cout << (g.areConnected(u1, u2)
-                         ? "✅ They are connected!\n"
-                         : "❌ No connection found.\n");
+                         ? "They are connected!\n"
+                         : " No connection found.\n");
                 break;
 
             case 9:
@@ -100,15 +100,16 @@ int main() {
 
             case 11:
                 g.clear();
-                cout << "🧹 Graph cleared.\n";
                 break;
 
             case 0:
-                cout << "👋 Exiting...\n";
+                cout << "Saving data before exit...\n";
+                g.save();  // persist current graph without clearing
+                cout << "Exiting...\n";
                 return 0;
 
             default:
-                cout << "⚠️  Invalid choice.\n";
+                cout << "  Invalid choice.\n";
         }
     }
 }

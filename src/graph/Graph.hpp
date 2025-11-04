@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
+#include "../io/FileManager.hpp"  
 
 class Graph {
 private:
@@ -12,8 +13,11 @@ private:
     std::unordered_map<std::string, double> pageRank;
     double damping = 0.85;
     int iterations = 20;
+    
+    FileManager fileManager;
 
 public:
+    Graph();
     // ===== User Management =====
     bool addUser(const std::string& username);
     bool removeUser(const std::string& username);
@@ -39,6 +43,9 @@ public:
 
     // ===== Utility =====
     void clear();
+
+    // Persist current in-memory graph to CSV without clearing
+    void save();
 };
 
 #endif // GRAPH_HPP
