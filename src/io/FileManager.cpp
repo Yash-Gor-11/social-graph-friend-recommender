@@ -47,6 +47,11 @@ void FileManager::loadWithHashes(unordered_map<string, unordered_set<string>>& a
         return;
     }
 
+    // Two-pass load: first read all entries to build id<->username maps, then
+    // resolve friend IDs to usernames. This ensures friend IDs referencing
+    // later lines are handled correctly.
+    struct Entry { string id; string username; string friendsField; };
+    vector<Entry> entries;
     string line;
     while (getline(file, line)) {
         if (line.empty()) continue;
@@ -54,17 +59,39 @@ void FileManager::loadWithHashes(unordered_map<string, unordered_set<string>>& a
         string id, username, friendsField;
         getline(ss, id, ',');
         getline(ss, username, ',');
-        getline(ss, friendsField, ',');
+        // read the rest as friendsField (may be empty)
+        getline(ss, friendsField);
 
-        idToUser[id] = username;
-        userToId[username] = id;
+        // Trim possible Windows CR
+        if (!id.empty() && id.back() == '\r') id.pop_back();
+        if (!username.empty() && username.back() == '\r') username.pop_back();
+        if (!friendsField.empty() && friendsField.back() == '\r') friendsField.pop_back();
 
+        entries.push_back({id, username, friendsField});
+    }
+
+    // First pass: populate id<->username maps and ensure an entry exists in adjList
+    for (const auto &e : entries) {
+        if (e.id.empty() || e.username.empty()) continue;
+        idToUser[e.id] = e.username;
+        userToId[e.username] = e.id;
+        // create empty friend set (will be filled in second pass)
+        adjList[e.username];
+    }
+
+    // Second pass: resolve friend ID lists into usernames
+    for (const auto &e : entries) {
+        if (e.username.empty()) continue;
         unordered_set<string> friendNames;
-        for (auto& fid : split(friendsField, '|')) {
-            if (idToUser.count(fid))
-                friendNames.insert(idToUser[fid]);
+        if (!e.friendsField.empty()) {
+            for (auto fid : split(e.friendsField, '|')) {
+                if (fid.empty()) continue;
+                if (!fid.empty() && fid.back() == '\r') fid.pop_back();
+                if (idToUser.count(fid))
+                    friendNames.insert(idToUser[fid]);
+            }
         }
-        adjList[username] = friendNames;
+        adjList[e.username] = friendNames;
     }
 
     file.close();
