@@ -7,6 +7,7 @@
 #include <unordered_set>
 #include "../io/FileManager.hpp"
 #include "../utils/utils.hpp"
+#include "../search/Trie.hpp"
 
 using namespace std;
 
@@ -21,9 +22,11 @@ private:
     int iterations = 20;
 
     FileManager fileManager;
+    Trie userTrie;
+    bool silent;
 
 public:
-    Graph();
+    Graph(bool silentMode = false);
 
     bool addUser(const string& username);
     bool removeUser(const string& username);
@@ -43,6 +46,9 @@ public:
     void displayAllUsers() const;
     void clear();
     void save();
+
+    void buildTrie();    // builds from all usernames
+    vector<string> searchPrefix(const string& prefix);
 };
 
 #endif

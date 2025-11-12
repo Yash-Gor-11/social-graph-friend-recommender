@@ -39,3 +39,23 @@
 
 # debug information files
 *.dwo
+
+# === General ===
+.DS_Store
+.vscode/
+*.log
+
+# === C++ / Backend ===
+backend/build/
+backend/bin/
+*.out
+*.o
+
+# === Node / Frontend ===
+frontend/node_modules/
+frontend/.env
+frontend/build/
+frontend/dist/
+
+# === Others ===
+*.exe

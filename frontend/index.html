@@ -1,0 +1,128 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Social Graph Demo (Full CLI Feature Set)</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Social Graph — Demo UI</h1>
+
+    <div class="search-wrapper">
+      <input id="searchInput" type="text" placeholder="Search users (demo)..." autocomplete="off" />
+      <ul id="suggestions" class="hidden"></ul>
+    </div>
+
+    <div class="controls">
+      <div class="control-row">
+        <input id="username" placeholder="Username" />
+        <button id="addBtn">Add User</button>
+        <button id="removeBtn">Remove User</button>
+      </div>
+
+      <div class="control-row">
+        <input id="userA" placeholder="User A" />
+        <input id="userB" placeholder="User B" />
+        <button id="addFriendBtn">Add Friendship</button>
+        <button id="removeFriendBtn">Remove Friendship</button>
+      </div>
+
+      <div class="control-row">
+        <button id="displayAllBtn">Display All Users</button>
+        <button id="clearGraphBtn">Clear Graph</button>
+      </div>
+
+      <div class="control-row">
+        <input id="singleUser" placeholder="Username for friends/mutual/pagerank" />
+        <button id="getFriendsBtn">Get Friends</button>
+        <button id="mutualBtn">Get Mutual Friends</button>
+        <button id="pagerankBtn">Compute PageRank</button>
+      </div>
+
+      <div class="control-row">
+        <input id="connA" placeholder="Connection A" />
+        <input id="connB" placeholder="Connection B" />
+        <button id="checkConnBtn">Check Connection (BFS)</button>
+        <button id="recommendBtn">Recommend Friends</button>
+      </div>
+
+      <div class="note">Search suggestions are frontend-driven (Trie not yet implemented in backend)</div>
+    </div>
+
+    <div class="cli">
+      <h2>Console Output</h2>
+      <pre id="cliOutput">&gt; Ready...</pre>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Social Graph — Interactive Demo</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="background"></canvas>
+
+  <div class="overlay">
+    <div class="container glass">
+      <h1>🌐 Social Graph — Demo UI</h1>
+
+      <div class="search-wrapper">
+        <input id="searchInput" type="text" placeholder="Search users..." autocomplete="off" />
+        <ul id="suggestions" class="hidden"></ul>
+      </div>
+
+      <div class="controls">
+        <div class="control-row">
+          <input id="username" placeholder="Username" />
+          <button id="addBtn">Add User</button>
+          <button id="removeBtn">Remove User</button>
+        </div>
+
+        <div class="control-row">
+          <input id="userA" placeholder="User A" />
+          <input id="userB" placeholder="User B" />
+          <button id="addFriendBtn">Add Friendship</button>
+          <button id="removeFriendBtn">Remove Friendship</button>
+        </div>
+
+        <div class="control-row">
+          <button id="displayAllBtn">Display All Users</button>
+          <button id="clearGraphBtn" class="danger">Clear Graph</button>
+        </div>
+
+        <div class="control-row">
+          <input id="singleUser" placeholder="Username for friends/mutual/pagerank" />
+          <button id="getFriendsBtn">Get Friends</button>
+          <button id="mutualBtn">Mutual Friends</button>
+          <button id="pagerankBtn">PageRank</button>
+        </div>
+
+        <div class="control-row">
+          <input id="connA" placeholder="Connection A" />
+          <input id="connB" placeholder="Connection B" />
+          <button id="checkConnBtn">Check Connection</button>
+          <button id="recommendBtn">Recommend Friends</button>
+        </div>
+
+       
+
+      <div class="cli">
+        <h2>📜 Console Output</h2>
+        <pre id="cliOutput">&gt; Ready...</pre>
+      </div>
+    </div>
+  </div>
+
+  <script src="background.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

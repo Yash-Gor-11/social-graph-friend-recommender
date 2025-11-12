@@ -10,9 +10,10 @@ using namespace std;
 class FileManager {
 private:
     string filePath;
+    bool silent;
 
 public:
-    FileManager(const string& path = "dataset/users.csv");
+    FileManager(const string& path = "dataset/users.csv", bool silentMode = false);
 
     // Load and save using hashed IDs
     void loadWithHashes(unordered_map<string, unordered_set<string>>& adjList,

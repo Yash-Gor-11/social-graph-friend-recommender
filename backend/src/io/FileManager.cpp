@@ -7,7 +7,7 @@
 
 using namespace std;
 
-FileManager::FileManager(const string& path) {
+FileManager::FileManager(const string& path, bool silentMode) : silent(silentMode) {
     filesystem::path base = filesystem::current_path();
     if (base.filename() == "build" || base.filename() == "Build")
         base = base.parent_path();
@@ -95,7 +95,8 @@ void FileManager::loadWithHashes(unordered_map<string, unordered_set<string>>& a
     }
 
     file.close();
-    cout << "Loaded users (with hash IDs) from " << filePath << "\n";
+    if (!silent)
+        cout << "Loaded users (with hash IDs) from " << filePath << "\n";
 }
 
 // ============ SAVE ============
@@ -119,7 +120,8 @@ void FileManager::saveWithHashes(const unordered_map<string, unordered_set<strin
     }
 
     file.close();
-    cout << "Saved users with hash IDs to " << filePath << "\n";
+    if (!silent)
+        cout << "Saved users with hash IDs to " << filePath << "\n";
 }
 
 // ============ ADD/REMOVE USERS ============

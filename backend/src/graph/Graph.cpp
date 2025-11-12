@@ -7,8 +7,9 @@
 using namespace std;
 
 // Constructor: load CSV data at start
-Graph::Graph() : fileManager("dataset/users.csv") {
+Graph::Graph(bool silentMode) : fileManager("dataset/users.csv", silentMode), silent(silentMode)  {
     fileManager.loadWithHashes(adjList, idToUser, userToId);
+    buildTrie();
 }
 
 // =================== USER MANAGEMENT ===================
@@ -20,6 +21,7 @@ bool Graph::addUser(const string& username) {
     idToUser[id] = username;
     adjList[username];
     fileManager.addUser(id, username);
+    buildTrie();
     return true;
 }
 
@@ -33,6 +35,7 @@ bool Graph::removeUser(const string& username) {
         idToUser.erase(id);
         fileManager.removeUser(id);
     }
+    buildTrie();
     return true;
 }
 
@@ -206,9 +209,22 @@ void Graph::clear() {
     userToId.clear();
     idToUser.clear();
     fileManager.saveWithHashes(adjList, idToUser, userToId);
+    buildTrie();
     cout << "Graph cleared.\n";
 }
 
 void Graph::save() {
     fileManager.saveWithHashes(adjList, idToUser, userToId);
+}
+
+// =================== TRIE SEARCH ===================
+
+void Graph::buildTrie() {
+    userTrie = Trie(); // reset
+    for(auto& [user, _] : adjList)
+        userTrie.insert(user);
+}
+
+vector<string> Graph::searchPrefix(const string& prefix) {
+return userTrie.prefixSearch(prefix);
 }
