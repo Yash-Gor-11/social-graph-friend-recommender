@@ -1,65 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Social Graph Demo (Full CLI Feature Set)</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div class="container">
-    <h1>Social Graph — Demo UI</h1>
-
-    <div class="search-wrapper">
-      <input id="searchInput" type="text" placeholder="Search users (demo)..." autocomplete="off" />
-      <ul id="suggestions" class="hidden"></ul>
-    </div>
-
-    <div class="controls">
-      <div class="control-row">
-        <input id="username" placeholder="Username" />
-        <button id="addBtn">Add User</button>
-        <button id="removeBtn">Remove User</button>
-      </div>
-
-      <div class="control-row">
-        <input id="userA" placeholder="User A" />
-        <input id="userB" placeholder="User B" />
-        <button id="addFriendBtn">Add Friendship</button>
-        <button id="removeFriendBtn">Remove Friendship</button>
-      </div>
-
-      <div class="control-row">
-        <button id="displayAllBtn">Display All Users</button>
-        <button id="clearGraphBtn">Clear Graph</button>
-      </div>
-
-      <div class="control-row">
-        <input id="singleUser" placeholder="Username for friends/mutual/pagerank" />
-        <button id="getFriendsBtn">Get Friends</button>
-        <button id="mutualBtn">Get Mutual Friends</button>
-        <button id="pagerankBtn">Compute PageRank</button>
-      </div>
-
-      <div class="control-row">
-        <input id="connA" placeholder="Connection A" />
-        <input id="connB" placeholder="Connection B" />
-        <button id="checkConnBtn">Check Connection (BFS)</button>
-        <button id="recommendBtn">Recommend Friends</button>
-      </div>
-
-      <div class="note">Search suggestions are frontend-driven (Trie not yet implemented in backend)</div>
-    </div>
-
-    <div class="cli">
-      <h2>Console Output</h2>
-      <pre id="cliOutput">&gt; Ready...</pre>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
-</body>
-</html> -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -72,51 +10,114 @@
   <canvas id="background"></canvas>
 
   <div class="overlay">
-    <div class="container glass">
-      <h1>🌐 Social Graph — Demo UI</h1>
+    <div class="main-container">
+      <!-- Header -->
+      <header class="header glass-card">
+        <h1>🌐 Social Graph</h1>
+        <p class="subtitle">Interactive Friend Recommendation Engine</p>
+      </header>
 
-      <div class="search-wrapper">
-        <input id="searchInput" type="text" placeholder="Search users..." autocomplete="off" />
-        <ul id="suggestions" class="hidden"></ul>
+      <!-- Controls Container -->
+      <div class="controls-container glass-card">
+        <!-- Search Section -->
+        <section class="section">
+          <h3 class="section-title">🔍 Search Users</h3>
+          <div class="search-wrapper">
+            <input id="searchInput" type="text" placeholder="Find users..." autocomplete="off" />
+            <ul id="suggestions" class="hidden"></ul>
+          </div>
+        </section>
+
+        <!-- User Management -->
+        <div class="row-sections">
+          <section class="section">
+            <h3 class="section-title">👤 User Management</h3>
+            <div class="section-content">
+              <input id="username" type="text" placeholder="Username" />
+              <div class="button-group">
+                <button id="addBtn" class="btn btn-primary">Add User</button>
+                <button id="removeBtn" class="btn btn-secondary">Remove</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="section">
+            <h3 class="section-title">🔗 Friendship</h3>
+            <div class="section-content">
+              <input id="userA" type="text" placeholder="User A" />
+              <input id="userB" type="text" placeholder="User B" />
+              <div class="button-group">
+                <button id="addFriendBtn" class="btn btn-primary">Add</button>
+                <button id="removeFriendBtn" class="btn btn-secondary">Remove</button>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Analysis Rows -->
+        <div class="row-sections">
+          <section class="section">
+            <h3 class="section-title">📊 User Analysis</h3>
+            <div class="section-content">
+              <input id="singleUser" type="text" placeholder="Username" />
+              <div class="button-group">
+                <button id="getFriendsBtn" class="btn btn-primary">Friends</button>
+                <button id="pagerankBtn" class="btn btn-primary">PageRank</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="section">
+            <h3 class="section-title">🤝 Mutual Friends</h3>
+            <div class="section-content">
+              <input id="mutualUser1" type="text" placeholder="User 1" />
+              <input id="mutualUser2" type="text" placeholder="User 2" />
+              <div class="button-group">
+                <button id="mutualBtn" class="btn btn-primary">Find Mutual</button>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Connection & Recommendations Rows -->
+        <div class="row-sections">
+          <section class="section">
+            <h3 class="section-title">🔄 Connection Check</h3>
+            <div class="section-content">
+              <input id="connA" type="text" placeholder="User A" />
+              <input id="connB" type="text" placeholder="User B" />
+              <div class="button-group">
+                <button id="checkConnBtn" class="btn btn-primary">Check Path</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="section">
+            <h3 class="section-title">💡 Recommendations</h3>
+            <div class="section-content">
+              <input id="recommendInput" type="text" placeholder="Username" />
+              <button id="recommendBtn" class="btn btn-accent" style="width: 100%;">Get Recommendations</button>
+            </div>
+          </section>
+        </div>
+
+        <!-- Utilities Row -->
+        <div class="row-sections">
+          <section class="section">
+            <h3 class="section-title">⚙️ Utilities</h3>
+            <div class="section-content">
+              <div class="button-group" style="flex-direction: column;">
+                <button id="displayAllBtn" class="btn btn-primary">Display All Users</button>
+                <button id="clearGraphBtn" class="btn btn-danger">Clear Graph</button>
+              </div>
+            </div>
+          </section>
+        </div>
       </div>
 
-      <div class="controls">
-        <div class="control-row">
-          <input id="username" placeholder="Username" />
-          <button id="addBtn">Add User</button>
-          <button id="removeBtn">Remove User</button>
-        </div>
-
-        <div class="control-row">
-          <input id="userA" placeholder="User A" />
-          <input id="userB" placeholder="User B" />
-          <button id="addFriendBtn">Add Friendship</button>
-          <button id="removeFriendBtn">Remove Friendship</button>
-        </div>
-
-        <div class="control-row">
-          <button id="displayAllBtn">Display All Users</button>
-          <button id="clearGraphBtn" class="danger">Clear Graph</button>
-        </div>
-
-        <div class="control-row">
-          <input id="singleUser" placeholder="Username for friends/mutual/pagerank" />
-          <button id="getFriendsBtn">Get Friends</button>
-          <button id="mutualBtn">Mutual Friends</button>
-          <button id="pagerankBtn">PageRank</button>
-        </div>
-
-        <div class="control-row">
-          <input id="connA" placeholder="Connection A" />
-          <input id="connB" placeholder="Connection B" />
-          <button id="checkConnBtn">Check Connection</button>
-          <button id="recommendBtn">Recommend Friends</button>
-        </div>
-
-       
-
-      <div class="cli">
-        <h2>📜 Console Output</h2>
+      <!-- Console Output -->
+      <div class="console glass-card">
+        <h3 class="section-title">📝 Console Output</h3>
         <pre id="cliOutput">&gt; Ready...</pre>
       </div>
     </div>
